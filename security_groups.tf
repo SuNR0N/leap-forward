@@ -1,8 +1,8 @@
 resource "aws_security_group" "norberta-sg-default" {
-  description = "Security group that allows all outbound traffic and internal HTTP traffic within the VPC"
+  description = "Security group that allows all outbound traffic and internal traffic within the VPC"
   vpc_id = "${aws_vpc.norberta-vpc.id}"
 
-  # HTTP access from the VPC
+  # Inbound traffic within the VPC
   ingress {
     from_port = 0
     to_port = 0
@@ -24,8 +24,8 @@ resource "aws_security_group" "norberta-sg-default" {
 	}
 }
 
-resource "aws_security_group" "norberta-sg-nat" {
-  description = "Security group for NAT instances that allows SSH from my IP"
+resource "aws_security_group" "norberta-sg-ssh" {
+  description = "Security group that allows SSH from my IP"
   vpc_id = "${aws_vpc.norberta-vpc.id}"
 
   # SSH access from my IP

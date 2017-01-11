@@ -13,7 +13,7 @@ resource "aws_instance" "norberta-node" {
 	instance_type = "${var.instance_type}"
   security_groups = [
     "${aws_security_group.norberta-sg-default.id}",
-    "${aws_security_group.norberta-sg-nat.id}",
+    "${aws_security_group.norberta-sg-ssh.id}",
     "${aws_security_group.norberta-sg-etcd.id}"
   ]
 	tags {
