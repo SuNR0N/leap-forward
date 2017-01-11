@@ -1,0 +1,18 @@
+---
+- hosts: etcd-nodes
+  remote_user: centos
+  vars_files:
+    - variables.yaml
+
+  tasks:
+  - name: ensure etcd is at the latest version
+    become: true
+    yum: name=etcd state=latest
+  - name: copies the templated etcd.service to the host
+    become: true
+    template:
+      src: etcd.service.j2
+      dest: /usr/lib/systemd/system/etcd.service
+  - name: restart etcd
+    become: true
+    systemd: name=etcd state=restarted

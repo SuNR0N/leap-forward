@@ -50,7 +50,7 @@ resource "aws_security_group" "norberta-sg-etcd" {
     from_port = 2379
     to_port = 2379
     protocol = "tcp"
-    cidr_blocks = ["${var.my_cidr}"]
+    cidr_blocks = ["${var.vpc_cidr}"]
   }
 
   tags {
