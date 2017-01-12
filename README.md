@@ -1,12 +1,20 @@
 # leap-forward
 
-## Generate Key Pair for accessing EC2 instances
+## Prerequisites
+
+- Locally installed terraform (https://www.terraform.io/downloads.html)
+- Locally installed Ansible (http://docs.ansible.com/ansible/intro_installation.html)
+- Locally installed Python (v3)
+  - AWS SDK for Python (https://aws.amazon.com/sdk-for-python/)
+
+### Generate Key Pair for accessing EC2 instances
 
 ```
 ssh-keygen -t rsa -C "leapforward" -P '' -f ~/.ssh/leapforward
+ssh-add ~/.ssh/leapforward
 ```
 
-## Provide values for predefined variables through `terraform.tfvars`
+### Provide values for predefined variables through `terraform.tfvars`
 
 ```
 touch terraform.tfvars
@@ -18,19 +26,26 @@ Set the required variables
   - ssh_key_name
   - my_cidr
 
-## Provisioning the infrastructure
+### Provisioning the infrastructure
 
 ```
 terraform apply
 ```
 
-## Accessing the EC2 instances through SSH once the infrastructure is provisioned
+### Accessing the EC2 instances through SSH once the infrastructure is provisioned
 
 ```
-ssh -i ~/.ssh/leapforward centos@hostname
+ssh centos@hostname
 ```
 
-## Deprovisioning the infrastructure
+### Running the Ansible playbook
+
+```
+cd ansible
+./playbook.sh
+```
+
+### Deprovisioning the infrastructure
 
 ```
 terraform destroy
