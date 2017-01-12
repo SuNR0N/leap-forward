@@ -1,6 +1,7 @@
 variable "access_key" {}
 variable "secret_key" {}
-variable "ssh_key_name" {}
+variable "ssh_key_name_etcd" {}
+variable "ssh_key_name_ovpn" {}
 variable "my_cidr" {}
 
 variable "prefix" {
@@ -12,17 +13,26 @@ variable "region" {
 variable "vpc_cidr" {
   default = "10.0.0.0/16"
 }
+variable "ovpn_cidr" {
+  default = "10.0.101.10/32"
+}
+variable "ovpn_ip" {
+  default = "10.0.101.10"
+}
 variable "name_tags" {
   type = "map"
   default = {
     "vpc" = "vpc"
     "rt" = "route-table"
-    "subnet" = "subnet"
+    "subnet-pri" = "subnet-private"
+    "subnet-pub" = "subnet-public"
     "node" = "node"
     "sg" = "security-group"
+    "elb" = "elastic-load-balancer"
+    "ovpn" = "ovpn"
   }
 }
-variable "subnet_azones" {
+variable "availability_zones" {
   type = "list"
   default = [
     "eu-west-1a",
@@ -30,7 +40,15 @@ variable "subnet_azones" {
     "eu-west-1c"
   ]
 }
-variable "subnet_cidrs" {
+variable "public_subnets_cidr" {
+  type = "list"
+  default = [
+    "10.0.101.0/24",
+    "10.0.102.0/24",
+    "10.0.103.0/24"
+  ]
+}
+variable "private_subnets_cidr" {
   type = "list"
   default = [
     "10.0.1.0/24",
@@ -49,9 +67,12 @@ variable "node_ips" {
   	"10.0.3.10"
   ]
 }
-variable "ami" {
-  description = "CentOS Image"
-  default = "ami-7abd0209"
+variable "amis" {
+  type = "map"
+  default = {
+    "centos" = "ami-7abd0209"
+    "ubuntu" = "ami-6f587e1c"
+  }
 }
 variable "instance_type" {
   default = "t2.micro"

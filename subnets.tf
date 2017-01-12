@@ -1,14 +1,49 @@
-# Internet Gateway
-resource "aws_internet_gateway" "norberta-ig" {
+# Subnets
+resource "aws_subnet" "public" {
+  count = 3
   vpc_id = "${aws_vpc.norberta-vpc.id}"
+  cidr_block = "${element(var.public_subnets_cidr, count.index)}"
+  availability_zone = "${element(var.availability_zones, count.index)}"
+  depends_on = ["aws_internet_gateway.ig"]
+  tags {
+    Name = "${var.prefix}-${var.name_tags["subnet-pub"]}-${count.index + 1}"
+    Owner = "${var.owner}"
+  }
 }
 
-# Internet Gateway Route Table
-resource "aws_route_table" "norberta-ig-rt" {
+resource "aws_subnet" "private" {
+  count = 3
+  vpc_id = "${aws_vpc.norberta-vpc.id}"
+  cidr_block = "${element(var.private_subnets_cidr, count.index)}"
+  availability_zone = "${element(var.availability_zones, count.index)}"
+  depends_on = ["aws_internet_gateway.ig"]
+  tags {
+    Name = "${var.prefix}-${var.name_tags["subnet-pub"]}-${count.index + 1}"
+    Owner = "${var.owner}"
+  }
+}
+
+# Elastic IPs
+resource "aws_eip" "eip" {
+  count = 3
+  vpc = true
+  depends_on = ["aws_internet_gateway.ig"]
+}
+
+# NAT Gateways within the public subnets
+resource "aws_nat_gateway" "nat" {
+  count = 3
+  allocation_id = "${element(aws_eip.eip.*.id, count.index)}"
+  subnet_id = "${element(aws_subnet.public.*.id, count.index)}"
+  depends_on = ["aws_internet_gateway.ig"]
+}
+
+resource "aws_route_table" "rt-nat" {
+  count = 3
   vpc_id = "${aws_vpc.norberta-vpc.id}"
   route = {
     cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.norberta-ig.id}"
+    nat_gateway_id = "${element(aws_nat_gateway.nat.*.id, count.index)}"
   }
   tags {
     Name = "${var.prefix}-${var.name_tags["rt"]}"
@@ -16,21 +51,14 @@ resource "aws_route_table" "norberta-ig-rt" {
   }
 }
 
-# Subnets
-resource "aws_subnet" "norberta-subnet" {
+resource "aws_route_table_association" "rta-ig-pub" {
   count = 3
-  vpc_id = "${aws_vpc.norberta-vpc.id}"
-  cidr_block = "${element(var.subnet_cidrs, count.index)}"
-  availability_zone = "${element(var.subnet_azones, count.index)}"
-  depends_on = ["aws_internet_gateway.norberta-ig"]
-  tags {
-    Name = "${var.prefix}-${var.name_tags["subnet"]}-${count.index + 1}"
-    Owner = "${var.owner}"
-  }
+  subnet_id = "${element(aws_subnet.public.*.id, count.index)}"
+  route_table_id = "${aws_route_table.rt-ig.id}"
 }
 
-resource "aws_route_table_association" "norberta-rta" {
+resource "aws_route_table_association" "rta-nat-pri" {
   count = 3
-  subnet_id = "${element(aws_subnet.norberta-subnet.*.id, count.index)}"
-  route_table_id = "${aws_route_table.norberta-ig-rt.id}"
+  subnet_id = "${element(aws_subnet.private.*.id, count.index)}"
+  route_table_id = "${element(aws_route_table.rt-nat.*.id, count.index)}"
 }
