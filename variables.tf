@@ -1,7 +1,6 @@
 variable "access_key" {}
 variable "secret_key" {}
-variable "ssh_key_name_etcd" {}
-variable "ssh_key_name_ovpn" {}
+variable "ssh_key_name" {}
 variable "my_cidr" {}
 
 variable "prefix" {
@@ -23,13 +22,15 @@ variable "name_tags" {
   type = "map"
   default = {
     "vpc" = "vpc"
-    "rt" = "route-table"
-    "subnet-pri" = "subnet-private"
-    "subnet-pub" = "subnet-public"
-    "node" = "node"
+    "rt-pri" = "private-route-table"
+    "rt-pub" = "public-route-table"
+    "subnet-pri" = "private-subnet"
+    "subnet-pub" = "public-subnet"
+    "etcd" = "etcd"
     "sg" = "security-group"
     "elb" = "elastic-load-balancer"
     "ovpn" = "ovpn"
+    "ig" = "internet-gateway"
   }
 }
 variable "availability_zones" {
@@ -71,7 +72,7 @@ variable "amis" {
   type = "map"
   default = {
     "centos" = "ami-7abd0209"
-    "ubuntu" = "ami-6f587e1c"
+    "ubuntu" = "ami-1967056a"
   }
 }
 variable "instance_type" {

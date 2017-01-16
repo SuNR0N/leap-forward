@@ -1,0 +1,4 @@
+[tag_Type_etcd]
+
+[etcd-nodes:children]
+tag_Type_etcd
