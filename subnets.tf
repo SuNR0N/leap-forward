@@ -1,6 +1,6 @@
 # Subnets
 resource "aws_subnet" "public" {
-  count = 3
+  count = "${var.instance_count}"
   vpc_id = "${aws_vpc.norberta-vpc.id}"
   cidr_block = "${element(var.public_subnets_cidr, count.index)}"
   availability_zone = "${element(var.availability_zones, count.index)}"
@@ -12,7 +12,7 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "private" {
-  count = 3
+  count = "${var.instance_count}"
   vpc_id = "${aws_vpc.norberta-vpc.id}"
   cidr_block = "${element(var.private_subnets_cidr, count.index)}"
   availability_zone = "${element(var.availability_zones, count.index)}"
@@ -25,24 +25,24 @@ resource "aws_subnet" "private" {
 
 # Elastic IPs
 resource "aws_eip" "eip" {
-  count = 3
+  count = "${var.instance_count}"
   vpc = true
   depends_on = ["aws_internet_gateway.ig"]
 }
 
 # NAT Gateways within the public subnets
 resource "aws_nat_gateway" "nat" {
-  count = 3
+  count = "${var.instance_count}"
   allocation_id = "${element(aws_eip.eip.*.id, count.index)}"
   subnet_id = "${element(aws_subnet.public.*.id, count.index)}"
   depends_on = ["aws_internet_gateway.ig"]
 }
 
 resource "aws_route_table" "private" {
-  count = 3
+  count = "${var.instance_count}"
   vpc_id = "${aws_vpc.norberta-vpc.id}"
   route = {
-    cidr_block = "0.0.0.0/0"
+    cidr_block = "${var.cidrs["all"]}"
     nat_gateway_id = "${element(aws_nat_gateway.nat.*.id, count.index)}"
   }
   tags {
@@ -52,13 +52,13 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route_table_association" "rta-ig-public" {
-  count = 3
+  count = "${var.instance_count}"
   subnet_id = "${element(aws_subnet.public.*.id, count.index)}"
   route_table_id = "${aws_route_table.public.id}"
 }
 
 resource "aws_route_table_association" "rta-nat-private" {
-  count = 3
+  count = "${var.instance_count}"
   subnet_id = "${element(aws_subnet.private.*.id, count.index)}"
   route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
 }

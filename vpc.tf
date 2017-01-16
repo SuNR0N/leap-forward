@@ -1,5 +1,5 @@
 resource "aws_vpc" "norberta-vpc" {
-	cidr_block = "${var.vpc_cidr}"
+	cidr_block = "${var.cidrs["vpc"]}"
   enable_dns_hostnames = "true"
 	tags {
 		Name = "${var.prefix}-${var.name_tags["vpc"]}"
@@ -13,9 +13,9 @@ resource "aws_elb" "elb" {
   subnets = ["${aws_subnet.public.*.id}"]
 	instances = ["${aws_instance.etcd-node.*.id}"]
   listener {
-    instance_port = 2379
+    instance_port = "${var.ports["etcd-client"]}"
     instance_protocol = "tcp"
-    lb_port = 2379
+    lb_port = "${var.ports["etcd-client"]}"
     lb_protocol = "tcp"
   }
   security_groups = [

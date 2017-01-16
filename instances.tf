@@ -4,9 +4,9 @@ resource "aws_key_pair" "kp" {
 }
 
 resource "aws_instance" "etcd-node" {
-  count = 3
+  count = "${var.instance_count}"
 	subnet_id = "${element(aws_subnet.private.*.id, count.index)}"
-  private_ip = "${element(var.node_ips, count.index)}"
+  private_ip = "${element(var.etcd_ips, count.index)}"
   key_name = "${aws_key_pair.kp.key_name}"
 	ami = "${var.amis["centos"]}"
 	instance_type = "${var.instance_type}"

@@ -6,17 +6,42 @@ variable "my_cidr" {}
 variable "prefix" {
   default = "norberta"
 }
+variable "owner" {
+  default = "Norbert"
+}
+variable "instance_count" {
+  default = 3
+}
 variable "region" {
   default = "eu-west-1"
 }
-variable "vpc_cidr" {
-  default = "10.0.0.0/16"
+variable "cidrs" {
+  type = "map"
+  default = {
+    "all" = "0.0.0.0/0"
+    "vpc" = "10.0.0.0/16"
+    "ovpn" = "10.0.101.10/32"
+  }
 }
-variable "ovpn_cidr" {
-  default = "10.0.101.10/32"
+variable "ports" {
+  type = "map"
+  default = {
+    "ssh" = 22
+    "etcd-client" = 2379
+    "etcd-peer" = 2380
+    "ovpn" = 1194
+  }
 }
 variable "ovpn_ip" {
   default = "10.0.101.10"
+}
+variable "etcd_ips" {
+  type = "list"
+  default = [
+    "10.0.1.10",
+  	"10.0.2.10",
+  	"10.0.3.10"
+  ]
 }
 variable "name_tags" {
   type = "map"
@@ -55,17 +80,6 @@ variable "private_subnets_cidr" {
     "10.0.1.0/24",
     "10.0.2.0/24",
     "10.0.3.0/24"
-  ]
-}
-variable "owner" {
-  default = "Norbert"
-}
-variable "node_ips" {
-  type = "list"
-  default = [
-    "10.0.1.10",
-  	"10.0.2.10",
-  	"10.0.3.10"
   ]
 }
 variable "amis" {
