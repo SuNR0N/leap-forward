@@ -1,0 +1,7 @@
+[tag_Type_kubernetes_controller]
+
+[tag_Type_kubernetes_worker]
+
+[kube-nodes:children]
+tag_Type_kubernetes_controller
+tag_Type_kubernetes_worker

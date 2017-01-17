@@ -1,0 +1,30 @@
+---
+- hosts: kube-nodes
+  remote_user: ubuntu
+  gather_facts: no
+
+  vars:
+    dest_dir: "/home/ubuntu/"
+    src_dir: "../certs"
+
+  pre_tasks:
+    - name: Update packages
+      raw: sudo apt-get update
+      become: true
+    - name: Install python
+      raw: sudo apt-get -y install python-simplejson
+      become: true
+
+  tasks:
+    - name: Copies ca.pem to kube host
+      copy:
+        src: "{{src_dir}}/ca.pem"
+        dest: "{{dest_dir}}"
+    - name: Copies kubernetes-key.pem to kube host
+      copy:
+        src: "{{src_dir}}/kubernetes-key.pem"
+        dest: "{{dest_dir}}"
+    - name: Copies kubernetes.pem to kube host
+      copy:
+        src: "{{src_dir}}/kubernetes.pem"
+        dest: "{{dest_dir}}"
