@@ -67,7 +67,7 @@ resource "aws_security_group" "sg-elb" {
     from_port = "${var.ports["etcd-client"]}"
     to_port = "${var.ports["etcd-client"]}"
     protocol = "tcp"
-    cidr_blocks = ["${var.cidrs["all"]}"]
+    cidr_blocks = ["${var.my_cidr}"]
   }
 
   # Allows outgoing TCP traffic on port 2379 (etcd) within the VPC
@@ -91,6 +91,14 @@ resource "aws_security_group" "sg-etcd" {
   # Allows incoming TCP traffic on port 2379,2380 (etcd) for all group members
   ingress {
     from_port = "${var.ports["etcd-client"]}"
+    to_port = "${var.ports["etcd-client"]}"
+    protocol = "tcp"
+    self = true
+  }
+
+  # Allows incoming TCP traffic on port 2380 (etcd) for all group members
+  ingress {
+    from_port = "${var.ports["etcd-peer"]}"
     to_port = "${var.ports["etcd-peer"]}"
     protocol = "tcp"
     self = true
@@ -110,14 +118,6 @@ resource "aws_security_group" "sg-etcd" {
     to_port = "${var.ports["ssh"]}"
     protocol = "tcp"
     cidr_blocks = ["${var.cidrs["ovpn"]}"]
-  }
-
-  # Allows incoming ICMP traffic for all group members
-  ingress {
-    from_port = 0
-    to_port = 0
-    protocol = "icmp"
-    self = true
   }
 
   # Allows all outbound traffic

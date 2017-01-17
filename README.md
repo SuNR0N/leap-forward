@@ -32,16 +32,44 @@ Set the required variables
 terraform apply
 ```
 
+### Getting useful IP and DNS addresses from terrafrom
+
+```
+terraform output elb_dns
+terraform output ovpn_public_ip
+terraform output etcd_private_ips
+```
+
 ### Accessing the EC2 instances through SSH once the infrastructure is provisioned
 
-OVPN box (can be accessed via its public DNS / IP):
+OVPN box:
+
+Can be accessed via its public DNS / IP
+
 ```
-ssh centos@hostname
+ssh ubuntu@hostname
+ssh ubuntu@$(terraform output ovpn_public_ip)
 ```
 
-etcd boxes (can be accessed via their private IPs):
+etcd boxes:
+
+Can be accessed via their private IPs with SSH forwarding from the local machine through the OVPN box
+
 ```
 ssh -A ubuntu@hostname
+ssh -A ubuntu@$(terraform output ovpn_public_ip)
+
+ssh centos@[Private IP of etcd box]
+```
+
+Can be accessed via their private IPs if connected to the VPN
+
+```
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no centos@[Private IP of etcd box]
+```
+OR without extra properties by removing the offending line from the `known_hosts` file
+```
+sed -i '' [offending line number]d ~/.ssh/known_hosts
 ssh centos@[Private IP of etcd box]
 ```
 
@@ -68,10 +96,10 @@ cd ansible_etcd
 Prerequisite: Active VPN connection to the VPC
 
 ```
-curl -L http://<etcd-ELB-dns-name>:2379/version
-curl -L http://<etcd-ELB-dns-name>:2379/health
-curl http://<etcd-ELB-dns-name>:2379/v2/keys/hello -XPUT -d value="world"
-curl http://<etcd-ELB-dns-name>:2379/v2/keys/hello
+curl -L http://$(terraform output elb_dns):2379/version
+curl -L http://$(terraform output elb_dns):2379/health
+curl http://$(terraform output elb_dns):2379/v2/keys/hello -XPUT -d value="world"
+curl http://$(terraform output elb_dns):2379/v2/keys/hello
 ```
 
 ### Deprovisioning the infrastructure
