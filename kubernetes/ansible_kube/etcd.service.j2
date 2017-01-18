@@ -1,0 +1,25 @@
+[Unit]
+Description=etcd
+Documentation=https://github.com/coreos
+
+[Service]
+ExecStart=/usr/bin/etcd --name {{ ETCD_NODES[CURRENT_NODE].name }} \
+  --cert-file={{ETCD_CONFIG_DIR}}/kubernetes.pem \
+  --key-file={{ETCD_CONFIG_DIR}}/kubernetes-key.pem \
+  --peer-cert-file={{ETCD_CONFIG_DIR}}/kubernetes.pem \
+  --peer-key-file={{ETCD_CONFIG_DIR}}/kubernetes-key.pem \
+  --trusted-ca-file={{ETCD_CONFIG_DIR}}/ca.pem \
+  --peer-trusted-ca-file={{ETCD_CONFIG_DIR}}/ca.pem \
+  --initial-advertise-peer-urls https://{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}:2380 \
+  --listen-peer-urls https://{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}:2380 \
+  --listen-client-urls https://{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}:2379,http://127.0.0.1:2379 \
+  --advertise-client-urls https://{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}:2379 \
+  --initial-cluster-token etcd-cluster-0 \
+  --initial-cluster {% for node in (ETCD_NODES.values() | list) %}{{ node.name }}=https://{{ node.ip }}:2380{%- if not loop.last %},{% endif -%}{% endfor %} \
+  --initial-cluster-state new \
+  --data-dir={{ETCD_DATA_DIR}}
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,52 @@
+---
+- hosts: kube-controllers
+  remote_user: ubuntu
+  vars_files:
+    - variables.yaml
+
+  tasks:
+    - name: Create etcd config directory
+      raw: mkdir -p {{ETCD_CONFIG_DIR}}
+      become: true
+    - name: Copy ca.pem to etcd config directory
+      copy:
+        src: "{{CERTS_DIR}}/ca.pem"
+        dest: "{{ETCD_CONFIG_DIR}}"
+      become: true
+    - name: Copy kubernetes-key.pem to etcd config directory
+      copy:
+        src: "{{CERTS_DIR}}/kubernetes-key.pem"
+        dest: "{{ETCD_CONFIG_DIR}}"
+      become: true
+    - name: Copy kubernetes.pem to etcd config directory
+      copy:
+        src: "{{CERTS_DIR}}/kubernetes.pem"
+        dest: "{{ETCD_CONFIG_DIR}}"
+      become: true
+    - name: Download etcd release binary
+      raw: wget {{ETCD_REPOSITORY}}/{{ETCD_RELEASE_BINARY_NAME}}.tar.gz
+    - name: Extract etcd binary
+      raw: tar -xvf {{ETCD_RELEASE_BINARY_NAME}}.tar.gz
+    - name: Install etcd
+      raw: mv {{ETCD_RELEASE_BINARY_NAME}}/etcd* {{BIN_DIR}}
+      become: true
+    - name: Clean up etcd install file and directory
+      raw: rm -rf {{ETCD_RELEASE_BINARY_NAME}}*
+    - name: Create etcd data directory
+      raw: mkdir -p {{ETCD_DATA_DIR}}
+      become: true
+    - name: Create etcd service directory
+      raw: mkdir -p {{ETCD_SERVICE_DIR}}
+      become: true
+    - name: Evaluate etcd.service template and copy it to the service directory
+      become: true
+      template:
+        src: etcd.service.j2
+        dest: "{{ETCD_SERVICE_DIR}}/etcd.service"
+    - name: Start etcd
+      become: true
+      systemd:
+        name: etcd
+        daemon_reload: yes
+        enabled: True
+        state: started

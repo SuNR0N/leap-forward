@@ -1,0 +1,19 @@
+---
+- hosts: kube-nodes
+  remote_user: ubuntu
+  vars_files:
+    - variables.yaml
+
+  tasks:
+    - name: Copy ca.pem to kube hosts
+      copy:
+        src: "{{CERTS_DIR}}/ca.pem"
+        dest: "{{KUBE_NODE_BASE_DIR}}"
+    - name: Copy kubernetes-key.pem to kube hosts
+      copy:
+        src: "{{CERTS_DIR}}/kubernetes-key.pem"
+        dest: "{{KUBE_NODE_BASE_DIR}}"
+    - name: Copy kubernetes.pem to kube hosts
+      copy:
+        src: "{{CERTS_DIR}}/kubernetes.pem"
+        dest: "{{KUBE_NODE_BASE_DIR}}"
