@@ -15,3 +15,4 @@
 - include: certs.yaml
 - include: etcd.yaml
 - include: kubernetes_control_plane.yaml
+- include: kubernetes_workers.yaml

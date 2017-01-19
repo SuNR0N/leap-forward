@@ -4,12 +4,12 @@ Documentation=https://github.com/coreos
 
 [Service]
 ExecStart=/usr/bin/etcd --name {{ ETCD_NODES[CURRENT_NODE].name }} \
-  --cert-file={{ETCD_CONFIG_DIR}}/kubernetes.pem \
-  --key-file={{ETCD_CONFIG_DIR}}/kubernetes-key.pem \
-  --peer-cert-file={{ETCD_CONFIG_DIR}}/kubernetes.pem \
-  --peer-key-file={{ETCD_CONFIG_DIR}}/kubernetes-key.pem \
-  --trusted-ca-file={{ETCD_CONFIG_DIR}}/ca.pem \
-  --peer-trusted-ca-file={{ETCD_CONFIG_DIR}}/ca.pem \
+  --cert-file={{ETCD_CONFIG_DIR}}/{{PEM_KUBERNETES}} \
+  --key-file={{ETCD_CONFIG_DIR}}/{{PEM_KUBERNETES_KEY}} \
+  --peer-cert-file={{ETCD_CONFIG_DIR}}/{{PEM_KUBERNETES}} \
+  --peer-key-file={{ETCD_CONFIG_DIR}}/{{PEM_KUBERNETES_KEY}} \
+  --trusted-ca-file={{ETCD_CONFIG_DIR}}/{{PEM_CA}} \
+  --peer-trusted-ca-file={{ETCD_CONFIG_DIR}}/{{PEM_CA}} \
   --initial-advertise-peer-urls https://{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}:2380 \
   --listen-peer-urls https://{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}:2380 \
   --listen-client-urls https://{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}:2379,http://127.0.0.1:2379 \

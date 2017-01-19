@@ -1,0 +1,103 @@
+---
+- hosts: kube-workers
+  name: Bootstrapping Kubernetes Workers
+  remote_user: ubuntu
+  vars_files:
+    - variables.yaml
+
+  tasks:
+    - name: "Creating Kubernetes config directory: {{KUBERNETES_CONFIG_DIR}}"
+      raw: mkdir -p {{KUBERNETES_CONFIG_DIR}}
+      become: true
+    - name: "Copying {{PEM_CA}} to {{KUBERNETES_CONFIG_DIR}}"
+      copy:
+        src: "{{CERTS_DIR}}/{{PEM_CA}}"
+        dest: "{{KUBERNETES_CONFIG_DIR}}"
+      become: true
+    - name: "Copying {{PEM_KUBERNETES_KEY}} to {{KUBERNETES_CONFIG_DIR}}"
+      copy:
+        src: "{{CERTS_DIR}}/{{PEM_KUBERNETES_KEY}}"
+        dest: "{{KUBERNETES_CONFIG_DIR}}"
+      become: true
+    - name: "Copying {{PEM_KUBERNETES}} to {{KUBERNETES_CONFIG_DIR}}"
+      copy:
+        src: "{{CERTS_DIR}}/{{PEM_KUBERNETES}}"
+        dest: "{{KUBERNETES_CONFIG_DIR}}"
+      become: true
+    - name: "Downloading {{DOCKER_RELEASE_BINARY_NAME}}"
+      raw: wget {{DOCKER_REPOSITORY}}/{{DOCKER_RELEASE_BINARY_NAME}}.tgz
+    - name: "Extracting {{DOCKER_RELEASE_BINARY_NAME}}.tgz"
+      raw: tar -xvf {{DOCKER_RELEASE_BINARY_NAME}}.tgz
+    - name: "Moving Docker binaries to {{BIN_DIR}}"
+      raw: mv docker/docker* {{BIN_DIR}}
+      become: true
+    - name: "Cleaning up temporary Docker file and directory"
+      raw: rm -rf docker*
+    - name: "Creating service directory: {{SERVICE_DIR}}"
+      raw: mkdir -p {{SERVICE_DIR}}
+      become: true
+    - name: "Evaluating {{TPL_DOCKER_SERVICE}} template and copying it to the service directory"
+      become: true
+      template:
+        src: "{{TEMPLATES_DIR}}/{{TPL_DOCKER_SERVICE}}"
+        dest: "{{SERVICE_DIR}}/{{DOCKER}}.service"
+    - name: "Starting docker"
+      become: true
+      systemd:
+        name: "{{DOCKER}}"
+        daemon_reload: yes
+        enabled: True
+        state: started
+    - name: "Creating CNI directory: {{CNI_DIR}}"
+      raw: mkdir -p {{CNI_DIR}}
+      become: true
+    - name: "Downloading CNI Plugin"
+      raw: wget {{KUBERNETES_NETWORK_PLUGIN_REPOSITORY}}/{{CNI_PLUGIN}}.tar.gz
+    - name: "Extracting CNI plugin to {{CNI_DIR}}"
+      raw: tar -xvf {{CNI_PLUGIN}}.tar.gz -C {{CNI_DIR}}
+      become: true
+    - name: "Cleaning up temporary CNI plugin file"
+      raw: rm {{CNI_PLUGIN}}.tar.gz
+    - name: "Downloading Kubernetes Controller"
+      raw: wget {{KUBERNETES_REPOSITORY}}/{{KUBERNETES_CONTROLLER}}
+    - name: "Downloading Kubernetes Proxy"
+      raw: wget {{KUBERNETES_REPOSITORY}}/{{KUBERNETES_PROXY}}
+    - name: "Downloading Kubernetes Kubelet"
+      raw: wget {{KUBERNETES_REPOSITORY}}/{{KUBERNETES_KUBELET}}
+    - name: "Granting execute privileges on Kubernetes binaries"
+      raw: chmod +x {{KUBERNETES_CONTROLLER}} {{KUBERNETES_PROXY}} {{KUBERNETES_KUBELET}}
+    - name: "Moving Kubernetes binaries to {{BIN_DIR}}"
+      raw: mv {{KUBERNETES_CONTROLLER}} {{KUBERNETES_PROXY}} {{KUBERNETES_KUBELET}} {{BIN_DIR}}
+      become: true
+    - name: "Creating Kubernetes config directory: {{KUBERNETES_KUBELET_DIR}}"
+      raw: mkdir -p {{KUBERNETES_KUBELET_DIR}}
+      become: true
+    - name: "Evaluating {{TPL_KUBECONFIG}} template and copying it to the config directory"
+      become: true
+      template:
+        src: "{{TEMPLATES_DIR}}/{{TPL_KUBECONFIG}}"
+        dest: "{{KUBERNETES_KUBELET_DIR}}/{{KUBERNETES_KUBECONFIG}}"
+    - name: "Evaluating {{TPL_KUBELET_SERVICE}} template and copying it to the service directory"
+      become: true
+      template:
+        src: "{{TEMPLATES_DIR}}/{{TPL_KUBELET_SERVICE}}"
+        dest: "{{SERVICE_DIR}}/{{KUBERNETES_KUBELET}}.service"
+    - name: "Starting Kubernetes Kubelet"
+      become: true
+      systemd:
+        name: "{{KUBERNETES_KUBELET}}"
+        daemon_reload: yes
+        enabled: True
+        state: started
+    - name: "Evaluating {{TPL_KUBE_PROXY_SERVICE}} template and copying it to the service directory"
+      become: true
+      template:
+        src: "{{TEMPLATES_DIR}}/{{TPL_KUBE_PROXY_SERVICE}}"
+        dest: "{{SERVICE_DIR}}/{{KUBERNETES_PROXY}}.service"
+    - name: "Starting Kubernetes Proxy"
+      become: true
+      systemd:
+        name: "{{KUBERNETES_PROXY}}"
+        daemon_reload: yes
+        enabled: True
+        state: started

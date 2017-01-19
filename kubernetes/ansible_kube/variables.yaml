@@ -1,6 +1,7 @@
 NODE_BASE_DIR: "/home/ubuntu/"
 BIN_DIR: "/usr/bin/"
 SERVICE_DIR: "/etc/systemd/system"
+CNI_DIR: "/opt/cni"
 
 ETCD: "etcd"
 ETCD_CONFIG_DIR: "/etc/etcd"
@@ -19,14 +20,19 @@ ETCD_NODES:
     name: controller2
 
 KUBERNETES_CONFIG_DIR: "/var/lib/kubernetes"
+KUBERNETES_KUBELET_DIR: "/var/lib/kubelet"
 KUBERNETES_REPOSITORY: "https://storage.googleapis.com/kubernetes-release/release/v1.4.0/bin/linux/amd64"
+KUBERNETES_NETWORK_PLUGIN_REPOSITORY: "https://storage.googleapis.com/kubernetes-release/network-plugins"
 KUBERNETES_API_SERVER: "kube-apiserver"
 KUBERNETES_CONTROLLER_MANAGER: "kube-controller-manager"
 KUBERNETES_SCHEDULER: "kube-scheduler"
 KUBERNETES_CONTROLLER: "kubectl"
+KUBERNETES_PROXY: "kube-proxy"
+KUBERNETES_KUBELET: "kubelet"
 KUBERNETES_AUTHORIZATION_POLICY_LOCATION: "https://raw.githubusercontent.com/kelseyhightower/kubernetes-the-hard-way/master"
 KUBERNETES_AUTHORIZATION_POLICY_NAME: "authorization-policy.jsonl"
 KUBERNETES_AUTH_TOKEN: "token.csv"
+KUBERNETES_KUBECONFIG: "kubeconfig"
 
 CERTS_DIR: "../certs"
 TOKENS_DIR: "../tokens"
@@ -42,3 +48,13 @@ TPL_ETCD_SERVICE: "etcd.service.j2"
 TPL_KUBE_APISERVER_SERVICE: "kube-apiserver.service.j2"
 TPL_KUBE_CONTROLLER_MANAGER_SERVICE: "kube-controller-manager.service.j2"
 TPL_KUBE_SCHEDULER_SERVICE: "kube-scheduler.service.j2"
+TPL_DOCKER_SERVICE: "docker.service.j2"
+TPL_KUBECONFIG: "kubeconfig.j2"
+TPL_KUBELET_SERVICE: "kubelet.service.j2"
+TPL_KUBE_PROXY_SERVICE: "kube-proxy.service.j2"
+
+DOCKER: "docker"
+DOCKER_REPOSITORY: "https://get.docker.com/builds/Linux/x86_64"
+DOCKER_RELEASE_BINARY_NAME: "docker-1.12.1"
+
+CNI_PLUGIN: "cni-07a8a28637e97b22eb8dfe710eeae1344f69d16e"
