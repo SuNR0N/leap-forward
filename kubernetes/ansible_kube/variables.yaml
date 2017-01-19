@@ -52,6 +52,7 @@ TPL_DOCKER_SERVICE: "docker.service.j2"
 TPL_KUBECONFIG: "kubeconfig.j2"
 TPL_KUBELET_SERVICE: "kubelet.service.j2"
 TPL_KUBE_PROXY_SERVICE: "kube-proxy.service.j2"
+TPL_HOSTS: "hosts.j2"
 
 DOCKER: "docker"
 DOCKER_REPOSITORY: "https://get.docker.com/builds/Linux/x86_64"

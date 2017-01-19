@@ -72,6 +72,12 @@
     - name: "Creating Kubernetes config directory: {{KUBERNETES_KUBELET_DIR}}"
       raw: mkdir -p {{KUBERNETES_KUBELET_DIR}}
       become: true
+      # DNS hack to resolve short private DNS names to private IPs
+    - name: "Evaluating {{TPL_HOSTS}} template and copying it to the /etc directory"
+      become: true
+      template:
+        src: "{{TEMPLATES_DIR}}/{{TPL_HOSTS}}"
+        dest: /etc/hosts
     - name: "Evaluating {{TPL_KUBECONFIG}} template and copying it to the config directory"
       become: true
       template:
