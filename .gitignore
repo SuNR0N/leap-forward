@@ -4,3 +4,4 @@
 *.tfvars
 *.retry
 kubernetes/certs
+kubernetes/tokens
