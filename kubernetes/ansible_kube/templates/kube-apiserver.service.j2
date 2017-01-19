@@ -1,0 +1,30 @@
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+ExecStart=/usr/bin/kube-apiserver \
+  --admission-control=NamespaceLifecycle,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
+  --advertise-address={{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }} \
+  --allow-privileged=true \
+  --apiserver-count=3 \
+  --authorization-mode=ABAC \
+  --authorization-policy-file={{KUBERNETES_CONFIG_DIR}}/{{KUBERNETES_AUTHORIZATION_POLICY_NAME}} \
+  --bind-address=0.0.0.0 \
+  --enable-swagger-ui=true \
+  --etcd-cafile={{KUBERNETES_CONFIG_DIR}}/ca.pem \
+  --insecure-bind-address=0.0.0.0 \
+  --kubelet-certificate-authority={{KUBERNETES_CONFIG_DIR}}/ca.pem \
+  --etcd-servers={% for node in (ETCD_NODES.values() | list) %}https://{{ node.ip }}:2379{%- if not loop.last %},{% endif -%}{% endfor %} \
+  --service-account-key-file={{KUBERNETES_CONFIG_DIR}}/kubernetes-key.pem \
+  --service-cluster-ip-range=10.32.0.0/24 \
+  --service-node-port-range=30000-32767 \
+  --tls-cert-file={{KUBERNETES_CONFIG_DIR}}/kubernetes.pem \
+  --tls-private-key-file={{KUBERNETES_CONFIG_DIR}}/kubernetes-key.pem \
+  --token-auth-file={{KUBERNETES_CONFIG_DIR}}/token.csv \
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

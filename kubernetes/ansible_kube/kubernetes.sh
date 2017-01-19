@@ -6,4 +6,4 @@ echo "Setting AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY based on terraform.tfvar
 export AWS_ACCESS_KEY_ID=$(awk '$1=="access_key" { print $3 }' ../terraform.tfvars | awk '{ gsub(/"/, "") } 1')
 export AWS_SECRET_ACCESS_KEY=$(awk '$1=="secret_key" { print $3 }' ../terraform.tfvars | awk '{ gsub(/"/, "") } 1')
 echo "Running Playbook for kube nodes"
-ansible-playbook kube.yaml
+ansible-playbook kubernetes.yaml

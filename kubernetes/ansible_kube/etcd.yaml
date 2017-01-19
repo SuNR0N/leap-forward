@@ -1,49 +1,50 @@
 ---
 - hosts: kube-controllers
+  name: Bootstrapping an H/A etcd cluster
   remote_user: ubuntu
   vars_files:
     - variables.yaml
 
   tasks:
-    - name: Create etcd config directory
+    - name: "Creating etcd config directory: {{ETCD_CONFIG_DIR}}"
       raw: mkdir -p {{ETCD_CONFIG_DIR}}
       become: true
-    - name: Copy ca.pem to etcd config directory
+    - name: "Copying {{PEM_CA}} to {{ETCD_CONFIG_DIR}}"
       copy:
-        src: "{{CERTS_DIR}}/ca.pem"
+        src: "{{CERTS_DIR}}/{{PEM_CA}}"
         dest: "{{ETCD_CONFIG_DIR}}"
       become: true
-    - name: Copy kubernetes-key.pem to etcd config directory
+    - name: "Copying {{PEM_KUBERNETES_KEY}} to {{ETCD_CONFIG_DIR}}"
       copy:
-        src: "{{CERTS_DIR}}/kubernetes-key.pem"
+        src: "{{CERTS_DIR}}/{{PEM_KUBERNETES_KEY}}"
         dest: "{{ETCD_CONFIG_DIR}}"
       become: true
-    - name: Copy kubernetes.pem to etcd config directory
+    - name: "Copying {{PEM_KUBERNETES}} to {{ETCD_CONFIG_DIR}}"
       copy:
-        src: "{{CERTS_DIR}}/kubernetes.pem"
+        src: "{{CERTS_DIR}}/{{PEM_KUBERNETES}}"
         dest: "{{ETCD_CONFIG_DIR}}"
       become: true
-    - name: Download etcd release binary
+    - name: "Downloading {{ETCD_RELEASE_BINARY_NAME}}"
       raw: wget {{ETCD_REPOSITORY}}/{{ETCD_RELEASE_BINARY_NAME}}.tar.gz
-    - name: Extract etcd binary
+    - name: "Extracting {{ETCD_RELEASE_BINARY_NAME}}.tar.gz"
       raw: tar -xvf {{ETCD_RELEASE_BINARY_NAME}}.tar.gz
-    - name: Install etcd
+    - name: "Moving etcd binaries to {{BIN_DIR}}"
       raw: mv {{ETCD_RELEASE_BINARY_NAME}}/etcd* {{BIN_DIR}}
       become: true
-    - name: Clean up etcd install file and directory
+    - name: "Cleaning up temporary etcd file and directory"
       raw: rm -rf {{ETCD_RELEASE_BINARY_NAME}}*
-    - name: Create etcd data directory
+    - name: "Creating etcd data directory: {{ETCD_DATA_DIR}}"
       raw: mkdir -p {{ETCD_DATA_DIR}}
       become: true
-    - name: Create etcd service directory
-      raw: mkdir -p {{ETCD_SERVICE_DIR}}
+    - name: "Creating service directory: {{SERVICE_DIR}}"
+      raw: mkdir -p {{SERVICE_DIR}}
       become: true
-    - name: Evaluate etcd.service template and copy it to the service directory
+    - name: "Evaluating {{TPL_ETCD_SERVICE}} template and copying it to the service directory"
       become: true
       template:
-        src: etcd.service.j2
-        dest: "{{ETCD_SERVICE_DIR}}/etcd.service"
-    - name: Start etcd
+        src: "{{TEMPLATES_DIR}}/{{TPL_ETCD_SERVICE}}"
+        dest: "{{SERVICE_DIR}}/{{ETCD}}.service"
+    - name: "Starting etcd"
       become: true
       systemd:
         name: etcd

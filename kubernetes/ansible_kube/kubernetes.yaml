@@ -1,15 +1,17 @@
 ---
 - hosts: kube-nodes
+  name: Bootstrapping Kubernetes cluster
   remote_user: ubuntu
   gather_facts: no
 
   pre_tasks:
-    - name: Update packages
+    - name: Updating packages
       raw: sudo apt-get update
       become: true
-    - name: Install python
+    - name: Installing python
       raw: sudo apt-get -y install python-simplejson
       become: true
 
 - include: certs.yaml
 - include: etcd.yaml
+- include: kubernetes_control_plane.yaml

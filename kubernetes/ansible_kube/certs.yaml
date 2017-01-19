@@ -1,19 +1,20 @@
 ---
 - hosts: kube-nodes
+  name: Copying TLS Certs
   remote_user: ubuntu
   vars_files:
     - variables.yaml
 
   tasks:
-    - name: Copy ca.pem to kube hosts
+    - name: Copying {{PEM_CA}} to {{NODE_BASE_DIR}}
       copy:
-        src: "{{CERTS_DIR}}/ca.pem"
-        dest: "{{KUBE_NODE_BASE_DIR}}"
-    - name: Copy kubernetes-key.pem to kube hosts
+        src: "{{CERTS_DIR}}/{{PEM_CA}}"
+        dest: "{{NODE_BASE_DIR}}"
+    - name: Copying {{PEM_KUBERNETES_KEY}} to {{NODE_BASE_DIR}}
       copy:
-        src: "{{CERTS_DIR}}/kubernetes-key.pem"
-        dest: "{{KUBE_NODE_BASE_DIR}}"
-    - name: Copy kubernetes.pem to kube hosts
+        src: "{{CERTS_DIR}}/{{PEM_KUBERNETES_KEY}}"
+        dest: "{{NODE_BASE_DIR}}"
+    - name: Copying {{PEM_KUBERNETES}} to {{NODE_BASE_DIR}}
       copy:
-        src: "{{CERTS_DIR}}/kubernetes.pem"
-        dest: "{{KUBE_NODE_BASE_DIR}}"
+        src: "{{CERTS_DIR}}/{{PEM_KUBERNETES}}"
+        dest: "{{NODE_BASE_DIR}}"
