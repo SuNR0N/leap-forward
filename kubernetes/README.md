@@ -13,14 +13,16 @@ Bootstrap Kubernetes in an automated fashion. Based on [Kelsey Hightower's Kuber
 - Locally installed `cfssl` and `cfssljson` (https://pkg.cfssl.org)
 - Locally installed `kubectl` (https://kubernetes.io/docs/user-guide/prereqs/)
 
-### Generating Key Pair for accessing EC2 instances
+## Provisioning the infrastructure
+
+#### Generating Key Pair for accessing EC2 instances
 
 ```
 ssh-keygen -t rsa -C "leapforward_kubernetes" -P '' -f ~/.ssh/leapforward_kubernetes
 ssh-add ~/.ssh/leapforward_kubernetes
 ```
 
-### Providing values for predefined variables through `terraform.tfvars`
+#### Providing values for predefined variables through `terraform.tfvars`
 
 ```
 touch terraform.tfvars
@@ -32,13 +34,13 @@ Set the required variables
   - ssh_key_name
   - my_cidr
 
-### Provisioning the infrastructure
+#### Applying the infrastructure changes
 
 ```
 terraform apply
 ```
 
-### Getting useful IP and DNS addresses from terrafrom once the infrastructure is provisioned
+#### Getting useful IP and DNS addresses from terrafrom once the infrastructure is provisioned
 
 ```
 terraform output elb_dns
@@ -49,7 +51,7 @@ terraform output kubernetes_worker_public_ips
 terraform output kubernetes_worker_private_ips
 ```
 
-### Accessing the EC2 instances through SSH once the infrastructure is provisioned
+#### Accessing the EC2 instances through SSH once the infrastructure is provisioned
 
 All instances can be accessed via their public DNS / IP addresses:
 
@@ -57,15 +59,15 @@ All instances can be accessed via their public DNS / IP addresses:
 ssh ubuntu@hostname
 ```
 
-### Installing components
+## Installing components
 
-#### Generating TLS certificates
+### Generating TLS certificates
 
 ```
 scripts/gen_certs.sh
 ```
 
-**Verification**
+#### Verification
 
 Ensure that the `certs` directory exists within your project and contains the following files:
   - `ca-config.json`
@@ -78,18 +80,18 @@ Ensure that the `certs` directory exists within your project and contains the fo
   - `kubernetes.csr`
   - `kubernetes.pem`
 
-#### Generating tokens for the Kubernetes components
+### Generating tokens for the Kubernetes components
 
 ```
 scripts/gen_tokens.sh
 ```
 
-**Verification**
+#### Verification
 
 Ensure that the `tokens` directory exists within your project and contains the following file:
   - `token.csv`
 
-#### Running the Ansible playbook
+### Running the Ansible playbook
 
 Run the following script which will bootstrap your Kubernetes nodes:
   - Copies over the generated TLS certificates to your  `kubernetes-controller` and  `kubernetes-worker` nodes
@@ -101,7 +103,7 @@ Run the following script which will bootstrap your Kubernetes nodes:
 scripts/kubernetes.sh
 ```
 
-**Verification**
+#### Verification
 
 kubernetes-controller nodes:
 
@@ -165,13 +167,13 @@ kubernetes-worker nodes:
   - `sudo systemctl status kube-proxy --no-pager`
 - Verify that the `hosts` file in `/etc` contains an assignment between the private IP of the node and its short private DNS
 
-#### Configuring remote access
+### Configuring remote access
 
 ```
 scripts/remote.sh
 ```
 
-**Verification**
+#### Verification
 
 Run the following commands on your local machine:
 
@@ -180,26 +182,26 @@ kubectl get componentstatuses
 kubectl get nodes
 ```
 
-#### Setting up container network routes
+### Setting up container network routes
 
 ```
 scripts/route.sh
 ```
 
-**Verification**
+#### Verification
 
 Ensure that the newly added 3 routes exist within the route table in AWS:
 ```
 aws ec2 describe-route-tables --filter "Name=tag:Name,Values=nk-route-table-igw"
 ```
 
-#### Deploying the Cluster DNS Add-on
+### Deploying the Cluster DNS Add-on
 
 ```
 scripts/dns.sh
 ```
 
-**Verification**
+#### Verification
 
 Run the following commands on your local machine:
 
@@ -208,14 +210,14 @@ kubectl --namespace=kube-system get svc
 kubectl --namespace=kube-system get pods
 ```
 
-### Testing the infrastructure
+## Testing the infrastructure
 
 Run the following script and check whether the deployed nginx server responds properly:
 ```
 scripts/smoke.sh
 ```
 
-### Deprovisioning the infrastructure
+## Deprovisioning the infrastructure
 
 ```
 terraform destroy
