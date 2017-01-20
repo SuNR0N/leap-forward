@@ -1,5 +1,6 @@
 #!/bin/bash
-CERTS_DIR="certs"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CERTS_DIR="${DIR}/../certs"
 
 if [ -d $CERTS_DIR ]
 then

@@ -19,6 +19,11 @@ ETCD_NODES:
     ip: 10.240.0.12
     name: controller2
 
+KUBERNETES_CLUSTER_CIDR: 10.200.0.0/16
+KUBERNETES_CLUSTER_DNS: 10.32.0.10
+KUBERNETES_SERVICE_CLUSTER_IP_RANGE: 10.32.0.0/24
+KUBERNETES_MASTER_IP: 10.240.0.10
+
 KUBERNETES_CONFIG_DIR: "/var/lib/kubernetes"
 KUBERNETES_KUBELET_DIR: "/var/lib/kubelet"
 KUBERNETES_REPOSITORY: "https://storage.googleapis.com/kubernetes-release/release/v1.4.0/bin/linux/amd64"

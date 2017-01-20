@@ -1,7 +1,8 @@
 #!/bin/bash
-PEM_CA_PATH="certs/ca.pem"
-ELB_DNS=$(terraform output elb_dns)
-KUBERNETES_TOKEN_PATH="tokens/token.csv"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PEM_CA_PATH="${DIR}/../certs/ca.pem"
+ELB_DNS=$(terraform output --state=${DIR}/../terraform.tfstate elb_dns)
+KUBERNETES_TOKEN_PATH="${DIR}/../tokens/token.csv"
 KUBERNETES_TOKEN_VALUE=$(awk -F, '$2 == "admin"{print $1}' ${KUBERNETES_TOKEN_PATH})
 
 command -v kubectl >/dev/null 2>&1 || {

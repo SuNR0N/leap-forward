@@ -1,5 +1,6 @@
 #!/bin/bash
-TOKENS_DIR="tokens"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+TOKENS_DIR="${DIR}/../tokens"
 
 if [ -d $TOKENS_DIR ]
 then

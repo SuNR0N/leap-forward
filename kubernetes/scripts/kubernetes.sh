@@ -1,7 +1,9 @@
 #!/bin/bash
-CERTS_DIR="../certs"
-KUBERNETES_TOKEN_PATH="../tokens/token.csv"
-TERRAFORM_TFVARS_PATH="../terraform.tfvars"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CERTS_DIR="${DIR}/../certs"
+KUBERNETES_TOKEN_PATH="${DIR}/../tokens/token.csv"
+TERRAFORM_TFVARS_PATH="${DIR}/../terraform.tfvars"
+ANSIBLE_DIR="${DIR}/../ansible_kube"
 
 if [ ! -f ${TERRAFORM_TFVARS_PATH} ]; then
     echo "terraform.tfvars doest not exist in parent directory"
@@ -28,4 +30,5 @@ echo "Setting KUBERNETES_TOKEN based on the randomly generated token for kubelet
 export KUBERNETES_TOKEN=$(awk -F, '$2 == "kubelet"{print $1}' ${KUBERNETES_TOKEN_PATH})
 
 echo "Running Playbook for Kubernetes"
+cd ${ANSIBLE_DIR}
 ansible-playbook kubernetes.yaml --extra-vars="KUBERNETES_AUTH_TOKEN_VALUE=${KUBERNETES_TOKEN}"

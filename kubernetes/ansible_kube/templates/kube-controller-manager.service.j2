@@ -5,13 +5,13 @@ Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 [Service]
 ExecStart=/usr/bin/kube-controller-manager \
   --allocate-node-cidrs=true \
-  --cluster-cidr=10.200.0.0/16 \
+  --cluster-cidr={{KUBERNETES_CLUSTER_CIDR}} \
   --cluster-name=kubernetes \
   --leader-elect=true \
   --master=http://{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}:8080 \
   --root-ca-file={{KUBERNETES_CONFIG_DIR}}/{{PEM_CA}} \
   --service-account-private-key-file={{KUBERNETES_CONFIG_DIR}}/{{PEM_KUBERNETES_KEY}} \
-  --service-cluster-ip-range=10.32.0.0/24 \
+  --service-cluster-ip-range={{KUBERNETES_SERVICE_CLUSTER_IP_RANGE}} \
   --v=2
 Restart=on-failure
 RestartSec=5
