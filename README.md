@@ -1,10 +1,10 @@
-# leap-forward
+# Deploying a stateful, clustered, HA service on AWS
 
 ## Prerequisites
 
 - Locally installed terraform (https://www.terraform.io/downloads.html)
 - Locally installed Ansible (http://docs.ansible.com/ansible/intro_installation.html)
-- Locally installed Python (v3)
+- Locally installed Python
   - AWS SDK for Python (https://aws.amazon.com/sdk-for-python/)
 
 ### Generate Key Pair for accessing EC2 instances
